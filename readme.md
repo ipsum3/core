@@ -2,12 +2,8 @@
 
 ``` bash
 # install the package
-composer require ipsum3/settings
+composer require ipsum3/core
 
-# run the migration
-php artisan vendor:publish --provider="Ipsum\Settings\SettingsServiceProvider"
-php artisan migrate
-
-# [optional] insert some example dummy data to the database
-php artisan db:seed --class="Backpack\Settings\database\seeds\SettingsTableSeeder"
+# Run install
+php artisan ipsum:core:install
 ```
