@@ -9,7 +9,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "prologue/alerts": "^0.4.3",
+        "prologue/alerts": "^0.4.5",
         "barryvdh/laravel-debugbar": "^3.2",
         "barryvdh/laravel-ide-helper": "^2.6"
     },
