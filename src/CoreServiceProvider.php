@@ -3,6 +3,7 @@
 namespace Ipsum\Core;
 
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Ipsum\Core\app\Models\Setting;
 use Schema;
@@ -45,6 +46,9 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->publishFiles();
 
+
+        $this->bladeDirectives();
+
     }
 
     public function publishFiles()
@@ -55,6 +59,17 @@ class CoreServiceProvider extends ServiceProvider
         ], 'install');
     }
 
+
+    public function bladeDirectives()
+    {
+        Blade::directive('date', function ($expression) {
+            return "<?php echo ($expression)->format('m/d/Y'); ?>";
+        });
+
+        Blade::directive('prix', function ($expression) {
+            return "<?php echo (int) $expression == $expression ? (int) $expression : number_format($expression, 2, ',', ' '); ?>";
+        });
+    }
 
 
 
