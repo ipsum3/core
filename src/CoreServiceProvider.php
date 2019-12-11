@@ -37,11 +37,9 @@ class CoreServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/ressources/views', 'IpsumCore');
         $this->loadJsonTranslationsFrom(__DIR__.'/ressources/lang');
 
-        if (!\App::runningInConsole()) {
-            $settings = Setting::all();
-            foreach ($settings as $key => $setting) {
-                Config::set($setting->key, $setting->value);
-            }
+        $settings = Setting::all();
+        foreach ($settings as $key => $setting) {
+            Config::set($setting->key, $setting->value);
         }
 
         $this->publishFiles();
