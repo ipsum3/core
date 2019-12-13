@@ -61,7 +61,7 @@ class CoreServiceProvider extends ServiceProvider
     public function bladeDirectives()
     {
         Blade::directive('date', function ($expression) {
-            return "<?php echo ($expression)->format('m/d/Y'); ?>";
+            return "<?php echo ($expression)->format('d/m/Y'); ?>";
         });
 
         Blade::directive('prix', function ($expression) {
