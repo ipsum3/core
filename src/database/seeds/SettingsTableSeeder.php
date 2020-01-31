@@ -9,8 +9,11 @@ class SettingsTableSeeder extends Seeder
 {
     public function run()
     {
+        $settings = Setting::all()->pluck('key')->toArray();
         foreach ($this->getConfig() as $config) {
-            Setting::create($config);
+            if (!in_array($config['key'], $settings)) {
+                Setting::create($config);
+            }
         }
 
     }
