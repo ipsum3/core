@@ -37,7 +37,7 @@ trait Slug
 
         // Renomme si slug existe déja
         $count = 1;
-        while ( static::where($this->slugChamp, $slug)->where('id', '!=', $this->exists ? 0 : $this->id)->count()) { //->withTrashed()
+        while ( static::where($this->slugChamp, $slug)->where('id', '!=', !$this->exists ? 0 : $this->id)->count()) { //->withTrashed()
             $slug = Str::slug($this->$base).'('.$count++.')';
         }
 
