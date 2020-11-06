@@ -3,6 +3,7 @@
 namespace Ipsum\Core;
 
 
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Ipsum\Core\app\Models\Setting;
@@ -37,10 +38,12 @@ class CoreServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/ressources/views', 'IpsumCore');
         $this->loadJsonTranslationsFrom(__DIR__.'/ressources/lang');
 
-        $settings = Setting::all();
-        foreach ($settings as $key => $setting) {
-            Config::set($setting->key, $setting->value);
-        }
+        try {
+            $settings = Setting::all();
+            foreach ($settings as $key => $setting) {
+                Config::set($setting->key, $setting->value);
+            }
+        } catch (QueryException $e) { }
 
         $this->publishFiles();
 
