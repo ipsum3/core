@@ -68,7 +68,7 @@ class CoreServiceProvider extends ServiceProvider
         });
 
         Blade::directive('prix', function ($expression) {
-            return "<?php echo (int) $expression == $expression ? (int) $expression : number_format($expression, 2, ',', ' '); ?>";
+            return "<?php echo number_format($expression, ((int) $expression == $expression ? 0 : 2), ',', ' '); ?>";
         });
     }
 
