@@ -43,4 +43,9 @@ trait Slug
 
         $this->attributes[$this->slugChamp] = $slug;
     }
+    
+    public function getRouteKeyName()
+    {
+        return $this->slugChamp;
+    }
 }
