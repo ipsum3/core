@@ -64,11 +64,11 @@ class CoreServiceProvider extends ServiceProvider
     public function bladeDirectives()
     {
         Blade::directive('date', function ($expression) {
-            return "<?php echo ($expression)->format('d/m/Y'); ?>";
+            return "<?php echo $expression ? ($expression)->format('d/m/Y') : ''; ?>";
         });
 
         Blade::directive('prix', function ($expression) {
-            return "<?php echo number_format($expression, ((int) $expression == $expression ? 0 : 2), ',', ' '); ?>";
+            return "<?php echo number_format($expression, ((int) $expression == $expression ? 0 : 2), ',', '&nbsp;'); ?>";
         });
     }
 
