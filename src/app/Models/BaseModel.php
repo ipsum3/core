@@ -8,4 +8,8 @@ class BaseModel extends Model
 {
 
     protected $perPage = 25;
+
+    protected $casts = [
+        'options' => 'array',
+    ];
 }
