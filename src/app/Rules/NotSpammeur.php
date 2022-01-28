@@ -3,6 +3,7 @@
 namespace Ipsum\Core\app\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use Carbon\Carbon;
 
 class NotSpammeur implements Rule
 {
@@ -28,6 +29,11 @@ class NotSpammeur implements Rule
      */
     public function passes($attribute, $value)
     {
+        
+        if (session()->has('not_spammeur_time') and session('not_spammeur_time')->greaterThan(Carbon::now()->subSecond(5))) {
+           return false;
+        }
+        
         $adresse = 'http://www.stopforumspam.com/api?';
         $query = array(
             'confidence' => 'true',
