@@ -24,6 +24,9 @@ class Command extends Cmd
     {
         $this->echo('info', $beforeNotice ? ' '.$beforeNotice : $command);
 
+        // make sure the command is an array as per Symphony 4.3+ requirement
+        $command = is_string($command) ? explode(' ', $command) : $command;
+        
         $process = new Process($command, null, null, null, $this->option('timeout'), null);
         $process->run(function ($type, $buffer) {
             if (Process::ERR === $type) {
