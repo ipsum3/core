@@ -43,10 +43,4 @@ trait Slug
 
         $this->attributes[$this->slugChamp] = $slug;
     }
-    
-    public function getRouteKeyName()
-    {
-        // Laravel 7 propose une meilleur solution avec Customizing The Key
-        return !request()->is(config('ipsum.admin.route_prefix').'*') ? $this->slugChamp : parent::getRouteKeyName();
-    }
 }
