@@ -6,6 +6,7 @@ namespace Ipsum\Core;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Ipsum\Core\app\Exceptions\Handler;
 use Ipsum\Core\app\Models\Setting;
 use Schema;
 use Config;
@@ -23,6 +24,10 @@ class CoreServiceProvider extends ServiceProvider
      * @var bool
      */
     protected $defer = false;
+
+    public $singletons = [
+        \Illuminate\Contracts\Debug\ExceptionHandler::class => Handler::class,
+    ];
 
 
     /**
