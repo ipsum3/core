@@ -86,6 +86,10 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/config/ipsum/translate.php', 'ipsum.translate'
+        );
+
         // register the artisan commands
         $this->commands($this->commands);
     }
