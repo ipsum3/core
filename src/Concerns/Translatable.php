@@ -50,23 +50,38 @@ trait Translatable
                 }]);
             });
 
-
             // Enregistrement dans la table translate
             static::saving(function (self $objet) {
+
+                $translate_deleted = [];
+
                 foreach ($objet->translatableAttributes() as $attribute) {
 
+                    $value = null;
                     if ($objet->isCustomFieldAttribute($attribute)) {
                         $infos = explode('.', $attribute);
+                        $custom_fields_name = $infos[0];
+                        $custom_fields_attribut = $infos[1];
 
-                        $data = !empty($objet->attributes[$infos[0]]) ? json_decode($objet->attributes[$infos[0]], true) : null;
 
-                        $objet->attributes[$infos[0]] = json_encode($data);
+                        if (isset($objet->attributes[$custom_fields_name]) or $objet->attributes[$custom_fields_name] != '') {
+                            // récupèaration de la valeur pour enregitrement
+                            $custom_fields = json_decode($objet->attributes[$custom_fields_name], true);
+                            $value = $custom_fields[$custom_fields_attribut] ?? null;
+                        }
 
-                        /*dd($objet->{$infos[0]}, $infos[1], $objet->{$infos[0]}->{$infos[1]}, $objet->getAttributes());
-                        dd($objet->getAttributes());
-                        $value = $objet->{$infos[0]}->{$infos[1]};*/
+                        if (isset($objet->original[$custom_fields_name]) or $objet->original[$custom_fields_name] != '') {
+                            // Annulation des champs translatable de base
+                            $custom_fields_original = json_decode($objet->original[$custom_fields_name], true);
+                            $custom_fields[$custom_fields_attribut] = $custom_fields_original[$custom_fields_attribut] ?? null;
+                            $objet->attributes[$custom_fields_name] = json_encode($custom_fields);
+                        }
+
                     } else {
-                        $value = $objet->$attribute;
+                        $value = $objet->attributes[$attribute];
+
+                        // Annulation des champs translatable de base
+                        $objet->attributes[$attribute] = $objet->original[$attribute];
                     }
 
                     if ($value !== null) {
@@ -76,18 +91,12 @@ trait Translatable
                         ], [
                             'value' => $value,
                         ]);
-                    }
-
-                    // Annulation des champs translatable de base
-                    // TODO ne fonctionne pas avec les custom fields
-                    if (!$objet->isCustomFieldAttribute($attribute)) {
-
-                        $objet->setAttribute($attribute, $objet->getOriginal($attribute));
                     } else {
-                        // TODO refactoriser
-                        $objet->setAttribute('custom_fields', $objet->getOriginal('custom_fields'));
+                        $translate_deleted[] = $attribute;
                     }
                 }
+
+                $objet->translates()->whereIn('attribut', $translate_deleted)->delete();
             });
 
         }
@@ -108,27 +117,28 @@ trait Translatable
     public function getAttributeValue($key)
     {
         // Récupèration de la traduction
-        // J'aurais préfèré utiliser Model::setRawAttributes() ou l'événement retrieved mais cela ne fonctionne pas, car le Eager Loading ne semble pas en place à ce moment
+        // J'aurais préfèré utiliser Model::setRawAttributes() ou l'événement retrieved mais cela ne fonctionne pas,
+        // car le Eager Loading ne semble pas en place à ce moment
 
         if ($key !== 'id' and !self::isDefaultCurrentLocale() and !$this->translate_loaded and $this->relationLoaded('translates') and $this->isTranslatableAttribute($key)) {
-            // Indique de ne pas recharger la traduction. A mettre au debut à cause des boucles infini
+            // Indique de ne pas recharger la traduction. A mettre au debut, pour éviter les boucles infini
+            // dans le cas ou getter est utiliser dans cette méthode
             $this->translate_loaded = true;
 
             foreach ($this->translates as $translate) {
                 if ($this->isCustomFieldAttribute($translate->attribut)) {
-                    /*$infos = explode('.', $translate->attribut);
-                    //dump($translate->attribut, $translate->value, $this->attributes[$infos[0]], $this->{$infos[0]}->{$infos[1]});
-                   $custom_field = $this->{$infos[0]};
-                   $custom_field->{$infos[1]} = $translate->value;
-                   $this->{$infos[0]} = $custom_field;
-                    dd($this->attributes);*/
+                    $infos = explode('.', $translate->attribut);
+                    $custom_fields_name = $infos[0];
+                    $custom_fields_attribut = $infos[1];
+
+                    // récupèaration de la valeur pour enregitrement
+                    $custom_fields = json_decode($this->attributes[$custom_fields_name], true);
+                    $custom_fields[$custom_fields_attribut] = $translate->value;
+                    $this->attributes[$custom_fields_name] = json_encode($custom_fields);
                 } else {
+                    $this->attributes[$translate->attribut] = $translate->value;
                 }
-                $this->attributes[$translate->attribut] = $translate->value;
             }
-
-            //dd($this->attributes);
-
           }
 
         return parent::getAttributeValue($key);
@@ -152,7 +162,7 @@ trait Translatable
     protected function translatableAttributes()
     {
         $attributs = $this->translatable_attributes;
-        if (property_exists($this, 'translatable_attributes_adds')) {
+        if (property_exists($this, 'translatable_attributes_adds') and config()->has($this->translatable_attributes_adds)) {
             $attributs = array_merge($attributs, is_array($this->translatable_attributes_adds) ? $this->translatable_attributes_adds : config($this->translatable_attributes_adds));
         }
 
