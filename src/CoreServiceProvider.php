@@ -37,7 +37,6 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Schema::defaultStringLength(191); // Fix version de mysql
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
         //$this->loadViewsFrom(__DIR__.'/ressources/views', 'IpsumCore');
