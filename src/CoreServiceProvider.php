@@ -16,6 +16,7 @@ class CoreServiceProvider extends ServiceProvider
 
     protected $commands = [
         \Ipsum\Core\app\Console\Commands\Install::class,
+        \Ipsum\Core\app\Console\Commands\LocaleExportBdd::class,
     ];
 
     /**
