@@ -21,7 +21,7 @@ namespace Ipsum\Core\app\Models;
 class Translate extends BaseModel
 {
 
-    protected $fillable = ['locale', 'attribut', 'value'];
+    protected $fillable = ['translatable_type', 'translatable_id', 'locale', 'attribut', 'value'];
 
 
     public $timestamps = false;
