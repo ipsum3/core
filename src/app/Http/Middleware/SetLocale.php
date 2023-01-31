@@ -23,10 +23,10 @@ class SetLocale
         }
 
         URL::defaults(['locale' => $request->route('locale')]);
-        app()->setLocale($request->route('locale'));
 
-        // Voir si utile. Voir paramétrage sync-laravel sur LaravelGettext
-        //LaravelGettext::setLocale(config('app.langues.'.$request->route('locale').'.gettext'));
+        app()->setLocale($request->route('locale'));
+        LaravelGettext::setDomain('messages');
+        LaravelGettext::setLocale(config('ipsum.translate.locales.'.$request->route('locale').'.gettext'));
 
         foreach (config('ipsum.translate.locales.'.$request->route('locale').'.setLocale') as $category => $locale) {
             setlocale(constant($category), $locale);

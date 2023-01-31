@@ -31,9 +31,9 @@ return [
             'nom' => 'en',
             'intitule' => 'EN',
             'setLocale' => [
-                'LC_TIME' => ['en_EN.utf8', 'en_EN', 'en_EN', 'en'],
+                'LC_TIME' => ['en_US.utf8', 'en_US', 'en_US', 'en'],
             ],
-            'gettext' => 'en_EN',
+            'gettext' => 'en_US',
         ]*/
     ],
 
