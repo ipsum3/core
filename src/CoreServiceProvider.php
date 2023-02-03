@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Ipsum\Core\app\Exceptions\Handler;
 use Ipsum\Core\app\Models\Setting;
+use Illuminate\Validation\Rules\Password;
 use Schema;
 use Config;
 
@@ -56,6 +57,7 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->bladeDirectives();
 
+        $this->globalPasswordRules();
     }
 
     public function publishFiles()
@@ -78,7 +80,14 @@ class CoreServiceProvider extends ServiceProvider
         });
     }
 
+    public function globalPasswordRules()
+    {
+        Password::defaults(function () {
+            $rule = Password::min(8);
 
+            return $rule->letters()->symbols();
+        });
+    }
 
     /**
      * Register the application services.
