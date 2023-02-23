@@ -19,7 +19,8 @@ class SetLocale
     {
         // Traitement page d'accueil
         if ($request->route('locale') === null) {
-            return redirect('/'.config('ipsum.translate.default_locale'));
+            // Ajout des query string pour par exemple garder le paramètre origin pour le tracking des réservations
+            return redirect('/'.config('ipsum.translate.default_locale') . ($request->getQueryString() ? '?' . $request->getQueryString() : ''));
         }
 
         URL::defaults(['locale' => $request->route('locale')]);
