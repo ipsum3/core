@@ -48,19 +48,21 @@ class NotSpammeur implements Rule
             $adresse .= $key.'='.$value.'&';
         }
 
-        $xml_string = file_get_contents($adresse);
-        if ($xml_string) {
-            $xml = new \SimpleXMLElement($xml_string);
-            if ($xml->success == 1) {
-                foreach ($xml->children() as $value) {
-                    if ($value->appears == "1" and  $value->confidence >= 0) {
-                        // spammeur detecté
-                        error_log('NotSpammeur rule detection ['.request()->ip().'] : stopforumspam detection'); // pour fail2ban
-                        return false;
+        try {
+            $xml_string = file_get_contents($adresse);
+            if ($xml_string) {
+                $xml = new \SimpleXMLElement($xml_string);
+                if ($xml->success == 1) {
+                    foreach ($xml->children() as $value) {
+                        if ($value->appears == "1" and  $value->confidence >= 0) {
+                            // spammeur detecté
+                            error_log('NotSpammeur rule detection ['.request()->ip().'] : stopforumspam detection'); // pour fail2ban
+                            return false;
+                        }
                     }
                 }
             }
-        }
+        } catch (\Exception $exception) { }
         return true;
     }
 
