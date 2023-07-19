@@ -29,12 +29,12 @@ class NotSpammeur implements Rule
      */
     public function passes($attribute, $value)
     {
-        
+
         if (session()->has('not_spammeur_time') and session('not_spammeur_time')->greaterThan(Carbon::now()->subSecond(5))) {
             error_log('NotSpammeur rule detection ['.request()->ip().'] : formulaire envoyé trop rapidement'); // pour fail2ban
-           return false;
+            return false;
         }
-        
+
         $adresse = 'http://www.stopforumspam.com/api?';
         $query = array(
             'confidence' => 'true',
@@ -48,19 +48,21 @@ class NotSpammeur implements Rule
             $adresse .= $key.'='.$value.'&';
         }
 
-        $xml_string = file_get_contents($adresse);
-        if ($xml_string) {
-            $xml = new \SimpleXMLElement($xml_string);
-            if ($xml->success == 1) {
-                foreach ($xml->children() as $value) {
-                    if ($value->appears == "1" and  $value->confidence >= 0) {
-                        // spammeur detecté
-                        error_log('NotSpammeur rule detection ['.request()->ip().'] : stopforumspam detection'); // pour fail2ban
-                        return false;
+        try {
+            $xml_string = file_get_contents($adresse);
+            if ($xml_string) {
+                $xml = new \SimpleXMLElement($xml_string);
+                if ($xml->success == 1) {
+                    foreach ($xml->children() as $value) {
+                        if ($value->appears == "1" and  $value->confidence >= 0) {
+                            // spammeur detecté
+                            error_log('NotSpammeur rule detection ['.request()->ip().'] : stopforumspam detection'); // pour fail2ban
+                            return false;
+                        }
                     }
                 }
             }
-        }
+        } catch (\Exception $exception) { }
         return true;
     }
 
