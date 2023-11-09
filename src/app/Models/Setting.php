@@ -25,4 +25,8 @@ namespace Ipsum\Core\app\Models;
 class Setting extends BaseModel
 {
     protected $table = 'settings';
+
+    protected $casts = [
+        'options' => 'array',
+    ];
 }
