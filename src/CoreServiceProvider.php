@@ -19,6 +19,7 @@ class CoreServiceProvider extends ServiceProvider
         \Ipsum\Core\app\Console\Commands\Install::class,
         \Ipsum\Core\app\Console\Commands\LocaleExportBdd::class,
         \Ipsum\Core\app\Console\Commands\LocaleImportBdd::class,
+        \Ipsum\Core\app\Console\Commands\IdeHelper::class,
     ];
 
     /**
