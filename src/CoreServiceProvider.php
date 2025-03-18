@@ -79,6 +79,11 @@ class CoreServiceProvider extends ServiceProvider
         Blade::directive('prix', function ($expression) {
             return "<?php echo number_format($expression, (intval($expression) == $expression ? 0 : 2), ',', '&nbsp;'); ?>";
         });
+
+        Blade::directive('asset_versioned', function ($path) {
+            // https://www.impressivewebs.com/cache-busting-front-end-resources-file-name-revving-still-necessary/
+            return "<?php echo asset({$path}).(file_exists(public_path({$path})) ? '?t='.filemtime(public_path({$path})) : ''); ?>";
+        });
     }
 
     public function globalPasswordRules()
