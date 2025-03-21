@@ -35,7 +35,7 @@ class CoreServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191); // Fix version de mysql
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
-        $this->loadViewsFrom(__DIR__.'/ressources/views', 'IpsumCore');
+        //$this->loadViewsFrom(__DIR__.'/ressources/views', 'IpsumCore');
         $this->loadJsonTranslationsFrom(__DIR__.'/ressources/lang');
 
         try {
