@@ -18,14 +18,14 @@ if (! function_exists('asset_versioned')) {
 
 if (! function_exists('prix')) {
     /**
-     * Generate an asset path with versioned for the application.
+     * Format un prix
      *
-     * @param  float  $expression
+     * @param  ?float  $expression
      * @return string
      */
-    function prix(float $expression): string
+    function prix(?float $expression): string
     {
-        return number_format($expression, (intval($expression) == $expression ? 0 : 2), ',', '&nbsp;');
+        return $expression === null ? 0 : number_format($expression, (intval($expression) == $expression ? 0 : 2), ',', '&nbsp;');
     }
 }
 
