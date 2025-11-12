@@ -16,6 +16,21 @@ if (! function_exists('asset_versioned')) {
 }
 
 
+if (! function_exists('round_prix')) {
+    /**
+     * Arrondi un prix
+     *
+     * @param int|float|null $expression
+     * @param int $precision
+     * @return float
+     */
+    function round_prix(int|float|null $expression, int $precision = 2): float
+    {
+        return round($expression ?? 0, $precision, PHP_ROUND_HALF_EVEN); // Arrondi bancaire
+    }
+}
+
+
 if (! function_exists('prix')) {
     /**
      * Format un prix
@@ -25,7 +40,7 @@ if (! function_exists('prix')) {
      */
     function prix(?float $expression): string
     {
-        return $expression === null ? 0 : number_format($expression, (intval($expression) == $expression ? 0 : 2), ',', '&nbsp;');
+        return number_format(round_prix($expression), (intval($expression) == $expression ? 0 : 2), ',', '&nbsp;');
     }
 }
 
