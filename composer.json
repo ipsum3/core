@@ -10,11 +10,11 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^8.0.2",
-        "prologue/alerts": "^1.0"
-    },
-    "require-dev": {
+        "prologue/alerts": "^1.0",
         "barryvdh/laravel-debugbar": "^3.6",
         "barryvdh/laravel-ide-helper": "^2.12"
+    },
+    "require-dev": {
     },
     "autoload": {
         "psr-4": {

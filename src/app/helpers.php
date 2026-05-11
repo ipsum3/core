@@ -43,4 +43,3 @@ if (! function_exists('prix')) {
         return number_format(round_prix($expression), (intval($expression) == $expression ? 0 : 2), ',', '&nbsp;');
     }
 }
-

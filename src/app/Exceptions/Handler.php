@@ -10,7 +10,7 @@ class Handler extends \App\Exceptions\Handler
 {
 
 
-    public function register()
+    public function register(): void
     {
         parent::register();
 
