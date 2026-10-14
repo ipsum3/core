@@ -120,7 +120,7 @@ trait Translatable
         // J'aurais préfèré utiliser Model::setRawAttributes() ou l'événement retrieved mais cela ne fonctionne pas,
         // car le Eager Loading ne semble pas en place à ce moment
 
-        if ($key !== 'id' and !self::isDefaultCurrentLocale() and !$this->translate_loaded and $this->relationLoaded('translates') and $this->isTranslatableAttribute($key)) {
+        if ($key !== 'id' and !self::isDefaultCurrentLocale() and !$this->translate_loaded and $this->relationLoaded('translates')) {
             // Indique de ne pas recharger la traduction. A mettre au debut, pour éviter les boucles infini
             // dans le cas ou getter est utiliser dans cette méthode
             $this->translate_loaded = true;
