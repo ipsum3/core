@@ -3,14 +3,17 @@
 namespace Ipsum\Core;
 
 
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Database\QueryException;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Ipsum\Core\app\Exceptions\Handler;
-use Ipsum\Core\app\Models\Setting;
 use Illuminate\Validation\Rules\Password;
+use Ipsum\Core\app\Models\Setting;
+use Prologue\Alerts\Facades\Alert;
 use Schema;
 use Config;
+use Throwable;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -29,18 +32,14 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected $defer = false;
 
-    public $singletons = [
-        \Illuminate\Contracts\Debug\ExceptionHandler::class => Handler::class,
-    ];
-
-
     /**
      * Bootstrap the application services.
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
+        $this->registerExceptionHandling();
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
         //$this->loadViewsFrom(__DIR__.'/ressources/views', 'IpsumCore');
@@ -91,6 +90,30 @@ class CoreServiceProvider extends ServiceProvider
             $rule = Password::min(8);
 
             return $rule->letters()->symbols();
+        });
+    }
+
+    protected function registerExceptionHandling(): void
+    {
+        $handler = $this->app->make(ExceptionHandlerContract::class);
+
+        if (! method_exists($handler, 'renderable')) {
+            return;
+        }
+
+        $handler->renderable(function (Throwable $e) {
+            if (
+                $e instanceof TokenMismatchException
+                || $e->getPrevious() instanceof TokenMismatchException
+            ) {
+                Alert::warning(
+                    'Le formulaire a expiré, merci de le valider à nouveau.'
+                )->flash();
+
+                return back()->withInput();
+            }
+
+            return null;
         });
     }
 

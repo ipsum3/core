@@ -2,12 +2,12 @@
 
 namespace Ipsum\Core\app\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
-use Prologue\Alerts\Facades\Alert;
+use Closure;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class Recaptcha implements Rule
+class Recaptcha implements ValidationRule
 {
 
     /**
@@ -20,40 +20,25 @@ class Recaptcha implements Rule
 
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         try {
-        $client = new Client();
-        $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
-            'form_params' => [
-                'secret' => env('RECAPTCHA_SECRET_KEY'),
-                'response' => $value,
-            ],
-        ]);
+            $client = new Client();
+            $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
+                'form_params' => [
+                    'secret' => env('RECAPTCHA_SECRET_KEY'),
+                    'response' => $value,
+                ],
+            ]);
 
-        $body = json_decode((string)$response->getBody());
+            $body = json_decode((string) $response->getBody());
 
-        return $body->success;
+            if (! is_object($body) || ! ($body->success ?? false)) {
+                $fail('Le reCAPTCHA a échoué. Veuillez réessayer.');
+            }
         } catch (RequestException $exception) {
             error_log('reCAPTCHA validation request failed: '.$exception->getMessage());
-            return false;
+            $fail('Le reCAPTCHA a échoué. Veuillez réessayer.');
         }
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'Le reCAPTCHA a échoué. Veuillez réessayer.';
     }
 }

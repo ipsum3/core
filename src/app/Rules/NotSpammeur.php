@@ -2,10 +2,11 @@
 
 namespace Ipsum\Core\app\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
 use Carbon\Carbon;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class NotSpammeur implements Rule
+class NotSpammeur implements ValidationRule
 {
 
     protected $ip;
@@ -20,19 +21,15 @@ class NotSpammeur implements Rule
         $this->ip = !empty($ip) ? $ip : \Request::getClientIp();
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        $notSpammeurTime = session('not_spammeur_time');
 
-        if (session()->has('not_spammeur_time') and session('not_spammeur_time')->greaterThan(Carbon::now()->subSecond(5))) {
+        if ($notSpammeurTime instanceof Carbon && $notSpammeurTime->greaterThan(Carbon::now()->subSecond(5))) {
             error_log('NotSpammeur rule detection ['.request()->ip().'] : formulaire envoyé trop rapidement'); // pour fail2ban
-            return false;
+            $fail('Vous avez été détecté comme spammeur.');
+
+            return;
         }
 
         $adresse = 'http://www.stopforumspam.com/api?';
@@ -52,27 +49,23 @@ class NotSpammeur implements Rule
             $xml_string = file_get_contents($adresse);
             if ($xml_string) {
                 $xml = new \SimpleXMLElement($xml_string);
-                if ($xml->success == 1) {
-                    foreach ($xml->children() as $value) {
-                        if ($value->appears == "1" and  $value->confidence >= 0) {
+                $success = (string) ($xml['success'] ?? $xml->success ?? '');
+
+                if ($success === '1') {
+                    foreach ($xml->children() as $entry) {
+                        $appears = (string) ($entry['appears'] ?? $entry->appears ?? '');
+                        $confidence = (float) ($entry['confidence'] ?? $entry->confidence ?? -1);
+
+                        if ($appears === '1' && $confidence >= 0) {
                             // spammeur detecté
                             error_log('NotSpammeur rule detection ['.request()->ip().'] : stopforumspam detection'); // pour fail2ban
-                            return false;
+                            $fail('Vous avez été détecté comme spammeur.');
+
+                            return;
                         }
                     }
                 }
             }
         } catch (\Exception $exception) { }
-        return true;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'Vous avez été detecté comme spammeur.';
     }
 }

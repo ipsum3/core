@@ -2,42 +2,24 @@
 
 namespace Ipsum\Core\app\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class NoLink implements Rule
+class NoLink implements ValidationRule
 {
-
-    protected $ip;
-
-    /**
-     * Create a new rule instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if (! is_string($value)) {
+            return;
+        }
 
-    }
-
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
-    {
-        return stristr($value, 'https://') === false and stristr($value, 'http://') === false and stristr($value, 'www.') === false and stristr($value, 'hxxp://') === false;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'Pour éviter le spam, il n\'est pas autorisé de poster des liens';
+        if (
+            str_contains(strtolower($value), 'https://')
+            || str_contains(strtolower($value), 'http://')
+            || str_contains(strtolower($value), 'www.')
+            || str_contains(strtolower($value), 'hxxp://')
+        ) {
+            $fail("Pour éviter le spam, il n'est pas autorisé de poster des liens.");
+        }
     }
 }

@@ -2,9 +2,10 @@
 
 namespace Ipsum\Core\app\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class Akismet implements Rule
+class Akismet implements ValidationRule
 {
 
     protected $ip;
@@ -19,14 +20,7 @@ class Akismet implements Rule
         $this->ip = !empty($ip) ? $ip : \Request::getClientIp();
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes( $attribute, $value )
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $request = 'blog=' . $_SERVER['SERVER_NAME'] .
             '&user_ip='. urlencode( $this->ip ) .
@@ -65,21 +59,9 @@ class Akismet implements Rule
             $response = explode( "\r\n\r\n", $response, 2 );
 
             // Si repsonse true => spammeur
-            if ( 'true' === $response[1] ) {
-                return false;
+            if ( isset( $response[1] ) && 'true' === trim( $response[1] ) ) {
+                $fail('Vous avez été détecté comme spammeur.');
             }
         }
-
-        return true;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'Vous avez été detecté comme spammeur.';
     }
 }

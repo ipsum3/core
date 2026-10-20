@@ -29,7 +29,9 @@ class SetLocale
         LaravelGettext::setDomain('messages');
         LaravelGettext::setLocale(config('ipsum.translate.locales.'.$request->route('locale').'.gettext'));
 
-        foreach (config('ipsum.translate.locales.'.$request->route('locale').'.setLocale') as $category => $locale) {
+        $setLocales = config('ipsum.translate.locales.'.$request->route('locale').'.setLocale') ?? [];
+
+        foreach ($setLocales as $category => $locale) {
             setlocale(constant($category), $locale);
         }
 
