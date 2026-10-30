@@ -11,8 +11,9 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^8.5",
-        "prologue/alerts": "^1.0",
-        "guzzlehttp/guzzle": "^7.0",
+        "fruitcake/laravel-debugbar": "^4.0",
+        "prologue/alerts": "^1.4.0",
+        "guzzlehttp/guzzle": "^8.3.0",
         "illuminate/console": "^13.0",
         "illuminate/database": "^13.0",
         "illuminate/session": "^13.0",
@@ -20,7 +21,6 @@
         "illuminate/validation": "^13.0"
     },
     "require-dev": {
-        "fruitcake/laravel-debugbar": "^4.0",
         "barryvdh/laravel-ide-helper": "^3.0"
     },
     "autoload": {
